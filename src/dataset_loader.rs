@@ -4,7 +4,7 @@ use ndarray::Array2;
 use ndarray::Array3;
 use image::{ImageBuffer, Rgb};
 
-pub fn get_data_from_mnist_files() -> (Array2<f32>, Array2<f32>, Array3<f32>, Array2<f32>) {
+pub fn get_data_from_mnist_files() -> (Array2<f32>, Array2<f32>, Array2<f32>, Array2<f32>) {
     let Mnist {
         trn_img,
         trn_lbl,
@@ -27,15 +27,24 @@ pub fn get_data_from_mnist_files() -> (Array2<f32>, Array2<f32>, Array3<f32>, Ar
     let train_labels: Array2<f32> = Array2::from_shape_vec((50_000, 1), trn_lbl)
         .expect("Error converting training labels to Array2 struct")
         .map(|x| *x as f32);
-    let _test_data = Array3::from_shape_vec((10_000, 28, 28), tst_img)
+
+        let test_data = Array2::from_shape_vec((10_000, 28 * 28), tst_img)
         .expect("Error converting images to Array3 struct")
-        .map(|x| *x as f32 / 256.);
+        .map(|x| *x as f32 / 256.0);
 
-    let _test_labels: Array2<f32> = Array2::from_shape_vec((10_000, 1), tst_lbl)
-        .expect("Error converting testing labels to Array2 struct")
+    // // Convert the returned Mnist struct to Array2 format
+    let test_labels: Array2<f32> = Array2::from_shape_vec((10_000, 1), tst_lbl)
+        .expect("Error converting training labels to Array2 struct")
         .map(|x| *x as f32);
+    // let _test_data = Array3::from_shape_vec((10_000, 28, 28), tst_img)
+    //     .expect("Error converting images to Array3 struct")
+    //     .map(|x| *x as f32 / 256.);
 
-    return (train_data, train_labels, _test_data, _test_labels);
+    // let _test_labels: Array2<f32> = Array2::from_shape_vec((10_000, 1), tst_lbl)
+    //     .expect("Error converting testing labels to Array2 struct")
+    //     .map(|x| *x as f32);
+
+    return (train_data, train_labels, test_data, test_labels);
 }
 
 
