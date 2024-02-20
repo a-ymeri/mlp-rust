@@ -1,6 +1,10 @@
-use ndarray::prelude::*;
 use mnist::*;
-pub fn get_data_from_mnist_files() -> (Array2<f32>, Array2<f32>, Array3<f32>, Array2<f32>){
+use ndarray::prelude::*;
+use ndarray::Array2;
+use ndarray::Array3;
+use image::{ImageBuffer, Rgb};
+
+pub fn get_data_from_mnist_files() -> (Array2<f32>, Array2<f32>, Array3<f32>, Array2<f32>) {
     let Mnist {
         trn_img,
         trn_lbl,
@@ -15,7 +19,7 @@ pub fn get_data_from_mnist_files() -> (Array2<f32>, Array2<f32>, Array3<f32>, Ar
         .finalize();
 
     // Can use an Array2 or Array3 here (Array3 for visualization)
-    let train_data = Array2::from_shape_vec((50_000, 28*28), trn_img)
+    let train_data = Array2::from_shape_vec((50_000, 28 * 28), trn_img)
         .expect("Error converting images to Array3 struct")
         .map(|x| *x as f32 / 256.0);
 
@@ -32,4 +36,18 @@ pub fn get_data_from_mnist_files() -> (Array2<f32>, Array2<f32>, Array3<f32>, Ar
         .map(|x| *x as f32);
 
     return (train_data, train_labels, _test_data, _test_labels);
+}
+
+
+
+fn _output_image(train_data: Array2<f32>, index: usize) {
+    let image = train_data.slice(s![index, ..]).into_shape((28, 28)).unwrap();
+
+    let mut img = ImageBuffer::new(28, 28);
+    for (x, y, pixel) in img.enumerate_pixels_mut() {
+        let val = image[[y as usize, x as usize]] * 255.0;
+        *pixel = Rgb([val as u8, val as u8, val as u8]);
+    }
+    let filename = format!("img_{}.png", index);
+    img.save(filename).unwrap();
 }
